@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Loading from "./Loading";
 
 function ProductsList() {
   const apiURL = "https://dummyjson.com/products";
@@ -14,13 +15,15 @@ function ProductsList() {
     getProducts();
   }, []);
 
+  if (products.length === 0) return <Loading />;
+
   return (
     <section className="products-list">
       <div className="container">
         <h2>Our Products:</h2>
         <div className="products-wrapper">
           {products.map((products) => (
-            <div className="product-card">
+            <div key={products.id} className="product-card">
               <img
                 className="product-image"
                 src={products.images[0]}
