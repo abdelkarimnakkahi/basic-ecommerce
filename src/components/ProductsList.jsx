@@ -1,39 +1,40 @@
 import React, { useEffect, useState } from "react";
 import Loading from "./Loading";
+import Product from "./Product";
 
 function ProductsList() {
   const apiURL = "https://dummyjson.com/products";
   const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const getProducts = () => {
-    fetch(apiURL)
-      .then((res) => res.json())
-      .then((data) => setProducts(data.products));
+  const getProducts = async () => {
+    try {
+      const res = await fetch(apiURL);
+      if (!res.ok) {
+        throw new Error(`HTTP error, status: ${res.status}`);
+      }
+      const data = await res.json();
+      setProducts(data.products);
+    } catch (error) {
+      console.error("Failed to fetch", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     getProducts();
   }, []);
 
-  if (products.length === 0) return <Loading />;
+  if (isLoading) return <Loading />;
 
   return (
     <section className="products-list">
       <div className="container">
         <h2>Our Products:</h2>
         <div className="products-wrapper">
-          {products.map((products) => (
-            <div key={products.id} className="product-card">
-              <img
-                className="product-image"
-                src={products.images[0]}
-                alt={products.id}
-              />
-              <h3 className="product-title">{products.title}</h3>
-              <p className="product-description">{products.description}</p>
-              <p className="product-price">{products.price}£</p>
-              <button className="btn btn-details">Details</button>
-            </div>
+          {products.map((product) => (
+            <Product key={product.id} product={product} isDescription={false} />
           ))}
         </div>
       </div>
